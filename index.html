@@ -231,7 +231,7 @@ createApp({
     ably.connection.on('connected', () => {
       this.connected = true;
     });
-     const channel = ably.channels.get('persisted:shops');
+     const channel = ably.channels.get('persisted.shops');
 
     channel.subscribe( (msg) => {
       this.counter++;
@@ -239,7 +239,7 @@ createApp({
       this.updateInventory(msg.data.data);
     });
 
-    const weatherChannel = ably.channels.get('persisted:weather');
+    const weatherChannel = ably.channels.get('persisted.weather');
 
     weatherChannel.subscribe( (msg) => {
       this.counter++;
