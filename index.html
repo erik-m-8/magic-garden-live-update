@@ -236,7 +236,7 @@ createApp({
     channel.subscribe( (msg) => {
       this.counter++;
       console.log(msg.data);
-      this.updateInventory(msg.data);
+      this.updateInventory(msg.data.data);
     });
 
     const weatherChannel = ably.channels.get('persisted:weather');
