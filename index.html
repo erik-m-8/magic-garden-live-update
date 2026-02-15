@@ -279,13 +279,14 @@
                 return;
               }
 
-              const messages = page.items; // newest → oldest
+              const messages = page.items.reverse(); // newest → oldest
 
               if (messages.length === 0) return;
 
               // Loop through the last 4 messages
               messages.forEach((msg) => {
                 if (msg.data && msg.data.data) {
+                    this.updateInventory(msg.data.data);
                 }
               });
             });
