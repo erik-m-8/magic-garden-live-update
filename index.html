@@ -281,7 +281,7 @@
           getInitialInventory(ably) {
             const channel = ably.channels.get("persisted.shops");
 
-            channel.history({ limit: 4 }, (err, page) => {
+            channel.history({ limit: 20 }, (err, page) => {
               if (err) {
                 console.error("Error fetching history:", err);
                 return;
