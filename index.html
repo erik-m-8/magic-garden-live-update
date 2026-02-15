@@ -65,12 +65,18 @@ createApp({
     ably.connection.on('connected', () => {
       this.connected = true;
     });
+     const channel = ably.channels.get('persisted:shops');
 
-    const channel = ably.channels.get('demo-channel');
-
-    channel.subscribe('persisted:shops', (msg) => {
+    channel.subscribe( (msg) => {
       this.counter++;
-      this.messages.unshift(msg.data.text);
+      console.log(msg.data);
+    });
+
+    const weatherChannel = ably.channels.get('persisted:weather');
+
+    weatherChannel.subscribe( (msg) => {
+      this.counter++;
+      console.log(msg.data);
     });
   }
 }).mount('#app');
