@@ -1,255 +1,324 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Realtime UI</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Realtime UI</title>
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
-  <!-- Vue -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Vue -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-  <!-- Ably -->
-  <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
-</head>
+    <!-- Ably -->
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+  </head>
 
-<body class="bg-light">
+  <body class="bg-light">
+    <div id="app" class="container mt-5">
+      <h2 class="mb-4">Live Messages</h2>
 
-<div id="app" class="container mt-5">
-  <h2 class="mb-4">Live Messages</h2>
+      <!-- Connection Status -->
+      <div class="mb-3">
+        <span class="badge" :class="connected ? 'bg-success' : 'bg-secondary'">
+          {{ connected ? 'Connected' : 'Connecting...' }}
+        </span>
+      </div>
 
-  <!-- Connection Status -->
-  <div class="mb-3">
-    <span class="badge"
-          :class="connected ? 'bg-success' : 'bg-secondary'">
-      {{ connected ? 'Connected' : 'Connecting...' }}
-    </span>
-  </div>
-
-  <!-- Counter -->
-  <div class="card mb-4">
-    <div class="card-body text-center">
-      <h5>Total Messages</h5>
-      <span class="badge bg-primary fs-3">{{ counter }}</span>
-    </div>
-  </div>
-
-  <!-- Shop Inventory Tabs -->
-  <ul class="nav nav-tabs mb-4" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="seed-tab" data-bs-toggle="tab" data-bs-target="#seed-table" type="button" role="tab">
-        Seeds
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="tool-tab" data-bs-toggle="tab" data-bs-target="#tool-table" type="button" role="tab">
-        Tools
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="egg-tab" data-bs-toggle="tab" data-bs-target="#egg-table" type="button" role="tab">
-        Eggs
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="decor-tab" data-bs-toggle="tab" data-bs-target="#decor-table" type="button" role="tab">
-        Decor
-      </button>
-    </li>
-  </ul>
-
-  <!-- Tab Content -->
-  <div class="tab-content">
-    <!-- Seeds Table -->
-    <div class="tab-pane fade show active" id="seed-table" role="tabpanel">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Seeds</h5>
+      <!-- Counter -->
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <h5>Total Messages</h5>
+          <span class="badge bg-primary fs-3">{{ counter }}</span>
         </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th>Name</th>
-                  <th>Stock</th>
-                  <th>Spawn Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in seedInventory" :key="item.name">
-                  <td>{{ item.name }}</td>
-                  <td><span class="badge bg-info">{{ item.stock }}</span></td>
-                  <td>{{ formatDate(item.spawn_time) }}</td>
-                </tr>
-                <tr v-if="seedInventory.length === 0">
-                  <td colspan="3" class="text-center text-muted">No seeds available</td>
-                </tr>
-              </tbody>
-            </table>
+      </div>
+
+      <!-- Shop Inventory Tabs -->
+      <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="seed-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#seed-table"
+            type="button"
+            role="tab"
+          >
+            Seeds
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="tool-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#tool-table"
+            type="button"
+            role="tab"
+          >
+            Tools
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="egg-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#egg-table"
+            type="button"
+            role="tab"
+          >
+            Eggs
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="decor-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#decor-table"
+            type="button"
+            role="tab"
+          >
+            Decor
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Seeds Table -->
+        <div class="tab-pane fade show active" id="seed-table" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Seeds</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Name</th>
+                      <th>Stock</th>
+                      <th>Spawn Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in seedInventory" :key="item.name">
+                      <td>{{ item.name }}</td>
+                      <td>
+                        <span class="badge bg-info">{{ item.stock }}</span>
+                      </td>
+                      <td>{{ formatDate(item.spawn_time) }}</td>
+                    </tr>
+                    <tr v-if="seedInventory.length === 0">
+                      <td colspan="3" class="text-center text-muted">
+                        No seeds available
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tools Table -->
+        <div class="tab-pane fade" id="tool-table" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Tools</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Name</th>
+                      <th>Stock</th>
+                      <th>Spawn Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in toolInventory" :key="item.name">
+                      <td>{{ item.name }}</td>
+                      <td>
+                        <span class="badge bg-warning">{{ item.stock }}</span>
+                      </td>
+                      <td>{{ formatDate(item.spawn_time) }}</td>
+                    </tr>
+                    <tr v-if="toolInventory.length === 0">
+                      <td colspan="3" class="text-center text-muted">
+                        No tools available
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Eggs Table -->
+        <div class="tab-pane fade" id="egg-table" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Eggs</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Name</th>
+                      <th>Stock</th>
+                      <th>Spawn Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in eggInventory" :key="item.name">
+                      <td>{{ item.name }}</td>
+                      <td>
+                        <span class="badge bg-success">{{ item.stock }}</span>
+                      </td>
+                      <td>{{ formatDate(item.spawn_time) }}</td>
+                    </tr>
+                    <tr v-if="eggInventory.length === 0">
+                      <td colspan="3" class="text-center text-muted">
+                        No eggs available
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Decor Table -->
+        <div class="tab-pane fade" id="decor-table" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">Decor</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Name</th>
+                      <th>Stock</th>
+                      <th>Spawn Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in decorInventory" :key="item.name">
+                      <td>{{ item.name }}</td>
+                      <td>
+                        <span class="badge bg-danger">{{ item.stock }}</span>
+                      </td>
+                      <td>{{ formatDate(item.spawn_time) }}</td>
+                    </tr>
+                    <tr v-if="decorInventory.length === 0">
+                      <td colspan="3" class="text-center text-muted">
+                        No decor available
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Tools Table -->
-    <div class="tab-pane fade" id="tool-table" role="tabpanel">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Tools</h5>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th>Name</th>
-                  <th>Stock</th>
-                  <th>Spawn Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in toolInventory" :key="item.name">
-                  <td>{{ item.name }}</td>
-                  <td><span class="badge bg-warning">{{ item.stock }}</span></td>
-                  <td>{{ formatDate(item.spawn_time) }}</td>
-                </tr>
-                <tr v-if="toolInventory.length === 0">
-                  <td colspan="3" class="text-center text-muted">No tools available</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <script>
+      const { createApp } = Vue;
 
-    <!-- Eggs Table -->
-    <div class="tab-pane fade" id="egg-table" role="tabpanel">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Eggs</h5>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th>Name</th>
-                  <th>Stock</th>
-                  <th>Spawn Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in eggInventory" :key="item.name">
-                  <td>{{ item.name }}</td>
-                  <td><span class="badge bg-success">{{ item.stock }}</span></td>
-                  <td>{{ formatDate(item.spawn_time) }}</td>
-                </tr>
-                <tr v-if="eggInventory.length === 0">
-                  <td colspan="3" class="text-center text-muted">No eggs available</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+      createApp({
+        data() {
+          return {
+            connected: false,
+            counter: 0,
+            messages: [],
+            inventory: [],
+            seedInventory: [],
+            toolInventory: [],
+            eggInventory: [],
+            decorInventory: [],
+          };
+        },
+        methods: {
+          formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+          },
+          updateInventory(data) {
+            if (!Array.isArray(data)) return;
 
-    <!-- Decor Table -->
-    <div class="tab-pane fade" id="decor-table" role="tabpanel">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Decor</h5>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover">
-              <thead class="table-dark">
-                <tr>
-                  <th>Name</th>
-                  <th>Stock</th>
-                  <th>Spawn Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in decorInventory" :key="item.name">
-                  <td>{{ item.name }}</td>
-                  <td><span class="badge bg-danger">{{ item.stock }}</span></td>
-                  <td>{{ formatDate(item.spawn_time) }}</td>
-                </tr>
-                <tr v-if="decorInventory.length === 0">
-                  <td colspan="3" class="text-center text-muted">No decor available</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+            this.inventory = data;
+            const seeds = data.filter((item) => item.type === "seed");
+            this.seedInventory = seeds.length ? seeds : this.seedInventory;
+            const tools = data.filter((item) => item.type === "tool");
+            this.toolInventory = tools.length ? tools : this.toolInventory;
+            const eggs = data.filter((item) => item.type === "egg");
+            this.eggInventory = eggs.length ? eggs : this.eggInventory;
+            const decors = data.filter((item) => item.type === "decor");
+            this.decorInventory = decors.length ? decors : this.decorInventory;
+          },
+          getInitialInventory(ably) {
+            const channel = ably.channels.get("persisted.shops");
 
-<script>
-const { createApp } = Vue;
+            channel.history({ limit: 4 }, (err, page) => {
+              if (err) {
+                console.error("Error fetching history:", err);
+                return;
+              }
 
-createApp({
-  data() {
-    return {
-      connected: false,
-      counter: 0,
-      messages: [],
-      inventory: [],
-      seedInventory: [],
-      toolInventory: [],
-      eggInventory: [],
-      decorInventory: []
-    }
-  },
-  methods: {
-    formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleString();
-    },
-    updateInventory(data) {
-      if (!Array.isArray(data)) return;
-      
-      this.inventory = data;
-      this.seedInventory = data.filter(item => item.type === 'seed');
-      this.toolInventory = data.filter(item => item.type === 'tool');
-      this.eggInventory = data.filter(item => item.type === 'egg');
-      this.decorInventory = data.filter(item => item.type === 'decor');
-    }
-  },
-  mounted() {
-    const ably = new Ably.Realtime({
-      key: 'l7skwA.N43T3w:LXpeyNyXkS2JspIRYZVL6v2qIxP6DXqVLtLRYkJNQPo',
-      clientId: 'github-page-client'
-    });
+              const messages = page.items; // newest → oldest
 
-    ably.connection.on('connected', () => {
-      this.connected = true;
-    });
-     const channel = ably.channels.get('persisted.shops');
+              if (messages.length === 0) return;
 
-    channel.subscribe( (msg) => {
-      this.counter++;
-      console.log(msg.data);
-      this.updateInventory(msg.data.data);
-    });
+              // Loop through the last 4 messages
+              messages.forEach((msg) => {
+                if (msg.data && msg.data.data) {
+                }
+              });
+            });
+          },
+        },
+        mounted() {
+          const ably = new Ably.Realtime({
+            key: "l7skwA.N43T3w:LXpeyNyXkS2JspIRYZVL6v2qIxP6DXqVLtLRYkJNQPo",
+            clientId: "github-page-client",
+          });
 
-    const weatherChannel = ably.channels.get('persisted.weather');
+          ably.connection.on("connected", () => {
+            this.getInitialInventory(ably);
+            this.connected = true;
+          });
+          const channel = ably.channels.get("persisted.shops");
 
-    weatherChannel.subscribe( (msg) => {
-      this.counter++;
-      console.log(msg.data);
-    });
-  }
-}).mount('#app');
-</script>
+          channel.subscribe((msg) => {
+            this.counter++;
+            console.log(msg.data);
+            this.updateInventory(msg.data.data);
+          });
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+          const weatherChannel = ably.channels.get("persisted.weather");
 
-</body>
+          weatherChannel.subscribe((msg) => {
+            this.counter++;
+            console.log(msg.data);
+          });
+        },
+      }).mount("#app");
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
