@@ -180,7 +180,11 @@
                   </thead>
                   <tbody>
                     <tr v-for="item in eggInventory" :key="item.name">
-                      <td>{{ formatCamelCase(item.name) }}</td>
+                      <td>{{ formatCamelCase(item.name) }}
+                        <span
+                          class="badge bg-danger ms-2"
+                          v-if="item.name === 'SnowEgg'">Only Last 5 minutes</span>
+                      </td>
                       <td>
                         <span class="badge bg-success">{{ item.stock }}</span>
                       </td>
@@ -268,7 +272,7 @@
             const eggs = data.filter((item) => item.type === "egg");
             if (eggs.length) {
               const isQuarterHour = eggs.some((egg) => {
-                const date = new Date(egg.spawnTime);
+                const date = new Date(egg.spawn_time);
                 return date.getMinutes() % 15 === 0;
               });
               this.eggInventory = isQuarterHour
@@ -340,7 +344,6 @@
 
           channel.subscribe((msg) => {
             this.counter++;
-            console.log(msg.data);
             this.updateInventory(msg.data.data);
           });
 
@@ -348,7 +351,6 @@
 
           weatherChannel.subscribe((msg) => {
             this.updateWeather(msg.data);
-            console.log(msg.data);
           });
         },
       }).mount("#app");
