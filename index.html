@@ -35,12 +35,158 @@
     </div>
   </div>
 
-  <!-- Messages -->
-  <div>
-    <div v-for="(message, index) in messages"
-         :key="index"
-         class="alert alert-success">
-      {{ message }}
+  <!-- Shop Inventory Tabs -->
+  <ul class="nav nav-tabs mb-4" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="seed-tab" data-bs-toggle="tab" data-bs-target="#seed-table" type="button" role="tab">
+        Seeds
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tool-tab" data-bs-toggle="tab" data-bs-target="#tool-table" type="button" role="tab">
+        Tools
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="egg-tab" data-bs-toggle="tab" data-bs-target="#egg-table" type="button" role="tab">
+        Eggs
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="decor-tab" data-bs-toggle="tab" data-bs-target="#decor-table" type="button" role="tab">
+        Decor
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- Seeds Table -->
+    <div class="tab-pane fade show active" id="seed-table" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Seeds</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>Stock</th>
+                  <th>Spawn Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in seedInventory" :key="item.name">
+                  <td>{{ item.name }}</td>
+                  <td><span class="badge bg-info">{{ item.stock }}</span></td>
+                  <td>{{ formatDate(item.spawn_time) }}</td>
+                </tr>
+                <tr v-if="seedInventory.length === 0">
+                  <td colspan="3" class="text-center text-muted">No seeds available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools Table -->
+    <div class="tab-pane fade" id="tool-table" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Tools</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>Stock</th>
+                  <th>Spawn Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in toolInventory" :key="item.name">
+                  <td>{{ item.name }}</td>
+                  <td><span class="badge bg-warning">{{ item.stock }}</span></td>
+                  <td>{{ formatDate(item.spawn_time) }}</td>
+                </tr>
+                <tr v-if="toolInventory.length === 0">
+                  <td colspan="3" class="text-center text-muted">No tools available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eggs Table -->
+    <div class="tab-pane fade" id="egg-table" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Eggs</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>Stock</th>
+                  <th>Spawn Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in eggInventory" :key="item.name">
+                  <td>{{ item.name }}</td>
+                  <td><span class="badge bg-success">{{ item.stock }}</span></td>
+                  <td>{{ formatDate(item.spawn_time) }}</td>
+                </tr>
+                <tr v-if="eggInventory.length === 0">
+                  <td colspan="3" class="text-center text-muted">No eggs available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Decor Table -->
+    <div class="tab-pane fade" id="decor-table" role="tabpanel">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Decor</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Name</th>
+                  <th>Stock</th>
+                  <th>Spawn Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in decorInventory" :key="item.name">
+                  <td>{{ item.name }}</td>
+                  <td><span class="badge bg-danger">{{ item.stock }}</span></td>
+                  <td>{{ formatDate(item.spawn_time) }}</td>
+                </tr>
+                <tr v-if="decorInventory.length === 0">
+                  <td colspan="3" class="text-center text-muted">No decor available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -53,7 +199,27 @@ createApp({
     return {
       connected: false,
       counter: 0,
-      messages: []
+      messages: [],
+      inventory: [],
+      seedInventory: [],
+      toolInventory: [],
+      eggInventory: [],
+      decorInventory: []
+    }
+  },
+  methods: {
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString();
+    },
+    updateInventory(data) {
+      if (!Array.isArray(data)) return;
+      
+      this.inventory = data;
+      this.seedInventory = data.filter(item => item.type === 'seed');
+      this.toolInventory = data.filter(item => item.type === 'tool');
+      this.eggInventory = data.filter(item => item.type === 'egg');
+      this.decorInventory = data.filter(item => item.type === 'decor');
     }
   },
   mounted() {
@@ -70,6 +236,7 @@ createApp({
     channel.subscribe( (msg) => {
       this.counter++;
       console.log(msg.data);
+      this.updateInventory(msg.data);
     });
 
     const weatherChannel = ably.channels.get('persisted:weather');
@@ -81,6 +248,8 @@ createApp({
   }
 }).mount('#app');
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
