@@ -211,7 +211,7 @@
                     <tr>
                       <th>Name</th>
                       <th>Stock</th>
-                      <th>Spawn Time</th>
+                      <th>Time</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -266,7 +266,15 @@
             const tools = data.filter((item) => item.type === "tool");
             this.toolInventory = tools.length ? tools : this.toolInventory;
             const eggs = data.filter((item) => item.type === "egg");
-            this.eggInventory = eggs.length ? eggs : this.eggInventory;
+            if (eggs.length) {
+              const isQuarterHour = eggs.some((egg) => {
+                const date = new Date(egg.spawnTime);
+                return date.getMinutes() % 15 === 0;
+              });
+              this.eggInventory = isQuarterHour
+                ? eggs
+                : [...this.eggInventory, ...eggs];
+            }
             const decors = data.filter((item) => item.type === "decor");
             this.decorInventory = decors.length ? decors : this.decorInventory;
           },
@@ -286,7 +294,7 @@
               // Loop through the last 4 messages
               messages.forEach((msg) => {
                 if (msg.data && msg.data.data) {
-                    this.updateInventory(msg.data.data);
+                  this.updateInventory(msg.data.data);
                 }
               });
             });
